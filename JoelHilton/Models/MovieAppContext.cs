@@ -15,15 +15,27 @@ namespace JoelHilton.Models
         }
 
         public DbSet<ApplicationResponse> Responses { get; set; }
+        public DbSet<Category> Categories { get; set; }
 
         protected override void OnModelCreating(ModelBuilder mb)
         {
+            mb.Entity<Category>().HasData(
+                new Category { CategoryId = 1, CategoryName="Adventure"},
+                new Category { CategoryId = 2, CategoryName = "Action" },
+                new Category { CategoryId = 3, CategoryName = "Sci-FI" },
+                new Category { CategoryId = 4, CategoryName = "Comedy" },
+                new Category { CategoryId = 5, CategoryName = "Drama" },
+                new Category { CategoryId = 6, CategoryName = "Family" },
+                new Category { CategoryId = 7, CategoryName = "Horror" },
+                new Category { CategoryId = 8, CategoryName = "Sci-FI" }
+            );
+
             mb.Entity<ApplicationResponse>().HasData(
                 
                 new ApplicationResponse
                 {
                     MovieId = 1,
-                    Category = "Adventure/Drama/Sci-Fi",
+                    CategoryId = 1,
                     Title = "Intersteller",
                     Year = 2014,
                     Director = "Christopher Nolan",
@@ -37,7 +49,7 @@ namespace JoelHilton.Models
                 new ApplicationResponse
                 {
                     MovieId = 2,
-                    Category = "Mystery/Thiller",
+                    CategoryId = 2,
                     Title = "Shutter Island",
                     Year = 2010,
                     Director = "Martin Scorsese",
@@ -51,7 +63,7 @@ namespace JoelHilton.Models
                 new ApplicationResponse
                 {
                 MovieId = 3,
-                    Category = "Drama/Mystery/Sci-Fi",
+                    CategoryId = 3,
                     Title = "The Prestige",
                     Year = 2006,
                     Director = "Christopher Nolan",

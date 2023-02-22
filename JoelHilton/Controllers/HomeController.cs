@@ -1,5 +1,6 @@
 ﻿using JoelHilton.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -11,12 +12,11 @@ namespace JoelHilton.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
-        private MovieAppContext _blahContext { get; set; }
-        public HomeController(ILogger<HomeController> logger, MovieAppContext someName)
+       
+        private MovieAppContext _daContext { get; set; }
+        public HomeController(MovieAppContext someName)
         {
-            _logger = logger;
-            _blahContext = someName;
+            _daContext = someName;
         }
 
         public IActionResult Index()
@@ -32,23 +32,76 @@ namespace JoelHilton.Controllers
         [HttpGet]
         public IActionResult Movies()
         {
+            ViewBag.Category = _daContext.Categories.ToList();
+            
             return View();
         }
 
         [HttpPost]
         public IActionResult Movies(ApplicationResponse ar)
         {
-            _blahContext.Add(ar);
-            _blahContext.SaveChanges();
+            if (ModelState.IsValid)
+            {
+                _daContext.Add(ar);
+                _daContext.SaveChanges();
 
-            return View("Confirmation", ar);
+                return View("Confirmation", ar);
+            }
+            else//if invalid
+            {
+                ViewBag.Category = _daContext.Categories.ToList();
+
+                return View();
+            } 
+                
         }
 
-
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
+        public IActionResult MovieList ()
         {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+            var applications = _daContext.Responses
+                .Include(x => x.Category)
+                //.Where(x => x.Edited == false)
+                .OrderBy(x => x.Title)
+                .ToList();
+
+
+            return View(applications);
         }
+        
+        [HttpGet]
+        public IActionResult Edit(int movieid)
+        {
+            ViewBag.Category = _daContext.Categories.ToList();
+
+            var movie = _daContext.Responses.Single(x => x.MovieId == movieid);
+
+            return View("Movies", movie);
+        }
+        [HttpPost]
+        public IActionResult Edit(ApplicationResponse blah)
+        {
+            _daContext.Update(blah);
+            _daContext.SaveChanges();
+
+            return RedirectToAction("MovieList");
+        }
+
+        [HttpGet]
+        public IActionResult Delete(int movieid)
+        {
+            var movie = _daContext.Responses.Single(x => x.MovieId == movieid);
+
+            return View(movie);
+        }
+
+        [HttpPost]
+        public IActionResult Delete(ApplicationResponse ar)
+        {
+            _daContext.Responses.Remove(ar);
+            _daContext.SaveChanges();
+
+            return RedirectToAction("MovieList");
+        }
+
     }
 }

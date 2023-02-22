@@ -22,9 +22,8 @@ namespace JoelHilton.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("Category")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
+                    b.Property<int>("CategoryId")
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Director")
                         .IsRequired()
@@ -53,13 +52,15 @@ namespace JoelHilton.Migrations
 
                     b.HasKey("MovieId");
 
+                    b.HasIndex("CategoryId");
+
                     b.ToTable("Responses");
 
                     b.HasData(
                         new
                         {
                             MovieId = 1,
-                            Category = "Adventure/Drama/Sci-Fi",
+                            CategoryId = 1,
                             Director = "Christopher Nolan",
                             Edited = false,
                             LentTo = "",
@@ -71,7 +72,7 @@ namespace JoelHilton.Migrations
                         new
                         {
                             MovieId = 2,
-                            Category = "Mystery/Thiller",
+                            CategoryId = 2,
                             Director = "Martin Scorsese",
                             Edited = false,
                             LentTo = "",
@@ -83,7 +84,7 @@ namespace JoelHilton.Migrations
                         new
                         {
                             MovieId = 3,
-                            Category = "Drama/Mystery/Sci-Fi",
+                            CategoryId = 3,
                             Director = "Christopher Nolan",
                             Edited = false,
                             LentTo = "",
@@ -92,6 +93,46 @@ namespace JoelHilton.Migrations
                             Title = "The Prestige",
                             Year = (short)2006
                         });
+                });
+
+            modelBuilder.Entity("JoelHilton.Models.Category", b =>
+                {
+                    b.Property<int>("CategoryId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("CategoryName")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("CategoryId");
+
+                    b.ToTable("Categories");
+
+                    b.HasData(
+                        new
+                        {
+                            CategoryId = 1,
+                            CategoryName = "Adventure"
+                        },
+                        new
+                        {
+                            CategoryId = 2,
+                            CategoryName = "Action"
+                        },
+                        new
+                        {
+                            CategoryId = 3,
+                            CategoryName = "Sci-FI"
+                        });
+                });
+
+            modelBuilder.Entity("JoelHilton.Models.ApplicationResponse", b =>
+                {
+                    b.HasOne("JoelHilton.Models.Category", "Category")
+                        .WithMany()
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }
